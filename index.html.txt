@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Exam Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .form-container {
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        #loginPage, #registerPage, #examApplicationPage, #waitingApprovalPage, #approvalStatusPage, #adminDashboardPage, #feePaymentPage {
+            display: none;
+        }
+        #loginPage.active, #registerPage.active, #examApplicationPage.active, #waitingApprovalPage.active, #approvalStatusPage.active, #adminDashboardPage.active, #feePaymentPage.active {
+            display: block;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            width: auto;
+        }
+        .other-courses-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .other-courses-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .other-courses-group input[type="text"] {
+            flex-grow: 1;
+        }
+        .waiting-container {
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+        }
+        .waiting-container h2 {
+            color: #333;
+        }
+        .waiting-container p {
+            color: #666;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status-approved {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .status-rejected {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .status-pending {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        .admin-panel {
+            background-color: #e9f7ef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .admin-panel h2 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        .application-list {
+            margin-top: 20px;
+        }
+        .application-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .application-details {
+            margin-bottom: 10px;
+        }
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .approve-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .reject-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .nav-links {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .nav-link {
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+            margin: 0 10px;
+        }
+        .login-info {
+            margin-top: 20px;
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .login-info h3 {
+            margin-top: 0;
+            color: #1565c0;
+        }
+        .error-message {
+            color: #f44336;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .course-group {
+            display: none;
+        }
+        .course-group.active {
+            display: block;
+        }
+        .fee-container {
+            background-color: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .fee-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin: 10px 0;
+        }
+        .subjects-list {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .subjects-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .payment-btn {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .payment-btn:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <!-- Login Page -->
+        <div id="loginPage" class="active">
+            <h1>Student Exam Application</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" pattern="[0-9]{10}" required placeholder="Enter 10-digit phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password" minlength="8">
+                    <span class="password-toggle" onclick="togglePasswordVisibility('password')">👁️</span>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="submit-btn" onclick="login()">Login</button>
+                </div>
+                
+                <div class="nav-links">
+                    <span class="nav-link" onclick="showRegisterPage()">Register New Account</span>
+                    <span class="nav-link" onclick="showAdminLogin()">Admin Login</span>
+                </div>
+                
+                <div class="login-info">
+                    <h3>Demo Credentials</h3>
+                    <p><strong>Student 1:</strong> Phone: 1234567890, Password: password123</p>
+                    <p><strong>Student 2:</strong> Phone: 5556667777, Password: student2024</p>
+                    <p><strong>Admin:</strong> Phone: 9876543210, Password: adminpass</p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Register Page -->
+        <div id="registerPage">
+            <h1>Register New Account</h1>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerPhoneNumber">Phone Number:</label>
+                    <input type="tel" id="registerPhoneNumber" name="registerPhoneNumber" pattern="[0-9]{10}" required placeholder="Enter 10-digit phone number">
+                    <div id="phoneError" class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Create Password:</label>
+                    <input type="password" id="registerPassword" name="registerPassword" required placeholder="Create a password (min 8 characters)" minlength="8">
+                    <span class="password-toggle" onclick="togglePasswordVisibility('registerPassword')">👁️</span>
+                    <div id="passwordError" class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password:</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm your password">
+                    <span class="password-toggle" onclick="togglePasswordVisibility('confirmPassword')">👁️</span>
+                    <div id="confirmPasswordError" class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="submit-btn" onclick="register()">Register</button>
+                </div>
+                
+                <div class="nav-links">
+                    <span class="nav-link" onclick="backToLogin()">Back to Login</span>
+                </div>
+            </form>
+        </div>
+
+        <!-- Exam Application Page -->
+        <div id="examApplicationPage">
+            <h1>Exam Application Form</h1>
+            <form id="examForm" action="#" method="post" onsubmit="return submitExamApplication(event)">
+                <div class="form-group">
+                    <label for="fullName">Full Name:</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="usn">Student USN:</label>
+                    <input type="text" id="usn" name="usn" required placeholder="Enter your University Seat Number">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="program">Academic Program:</label>
+                    <select id="program" name="program" required>
+                        <option value="">Select Your Program</option>
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="graduate">Graduate</option>
+                        <option value="postgraduate">Postgraduate</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="branch">Branch:</label>
+                    <select id="branch" name="branch" required>
+                        <option value="">Select Your Branch</option>
+                        <option value="CSE">Computer Science and Engineering (CSE)</option>
+                        <option value="ISC">Information Science and Computer Engineering (ISC)</option>
+                        <option value="ECE">Electronics and Communication Engineering (ECE)</option>
+                        <option value="EEE">Electrical and Electronics Engineering (EEE)</option>
+                        <option value="ME">Mechanical Engineering (ME)</option>
+                        <option value="AIML">Artificial Intelligence and Machine Learning (AIML)</option>
+                        <option value="AIDS">Artificial Intelligence and Data Science (AIDS)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="semester">Semester:</label>
+                    <select id="semester" name="semester" required onchange="updateCourseOptions()">
+                        <option value="">Select Semester</option>
+                        <option value="semester1">Semester 1</option>
+                        <option value="semester2">Semester 2</option>
+                        <option value="semester3">Semester 3</option>
+                        <option value="semester4">Semester 4</option>
+                        <option value="semester5">Semester 5</option>
+                        <option value="semester6">Semester 6</option>
+                        <option value="semester7">Semester 7</option>
+                        <option value="semester8">Semester 8</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Courses for Examination:</label>
+                    
+                    <!-- Semester 1 Courses -->
+                    <div id="semester1Courses" class="course-group">
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="courses" value="MA101">
+                                Mathematics (MA101)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21CH21">
+                                Chemistry (21CH21)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21PH22">
+                                Physics (21PH22)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EVS23">
+                                Environmental Studies (21EVS23)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21CV24">
+                                Civil (21CV24)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21PHL21">
+                                Physics Lab (21PHL21)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21CHL22">
+                                Chemistry Lab (21CHL22)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Semester 2 Courses -->
+                    <div id="semester2Courses" class="course-group">
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="courses" value="21CHE22">
+                                Chemistry (21CHE22)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21MAT22">
+                                Mathematics 2 (21MAT22)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21PSP23">
+                                Problem Solving (21PSP23)
+                            </label>
+                            <label>
+                              <input type="checkbox" name="courses" value="21ELN24">
+                                BASIC ELECTRONICS  (21PSP23)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21CHEL26">
+                                CHEMISTRY LAB(21CHEL26)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21CPL27">
+                                COMPUTER LAB(21CPL27)
+                                 </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21SFH28">
+                                SCIENTIFIC FOUNDATION(21SFH29)
+                                 </label>
+                                
+                        </div>
+                    </div>
+ <!-- Semester 3 Courses -->
+                    <div id="semester3Courses" class="course-group">
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="courses" value="21MAT31">
+                                mathematics 3 (21MAT22)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC381">
+                                MULTISIM LAB (21EC381)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC32">
+                                DSDV (21EC32)
+                            </label>
+                            <label>
+                              <input type="checkbox" name="courses" value="21EC33">
+                                BASIC SIGNALS  (21EC33)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21EC34">
+                                ANALOG CIRCUIT(21EC34)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21ECL35">
+                                ANALOG LAB(21ECL35)
+                                 </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21SCR36">
+                                SOCIAL CONNECT(21SCR36)
+                                 </label>
+                                 <label>
+                              <input type="checkbox" name="courses" value="21CIP37">
+                                CONSTITUTION(21CIP37)
+                                 </label>
+                                
+                        </div>
+                    </div>
+
+     <!-- Semester 4 Courses -->
+                    <div id="semester4Courses" class="course-group">
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="courses" value="21MAT41">
+                                mathematics 4 (21MAT41)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC482">
+                                C++ LAB (21EC482)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC42">
+                                DSP (21EC42)
+                            </label>
+                            <label>
+                              <input type="checkbox" name="courses" value="21EC43">
+                                C&C  (21EC43)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21EC44">
+                                COMMUNICATION THEORY(21EC44)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21BE45">
+                                BIOLOGY(21BE45)
+                                 </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21ECL46">
+                                COMMUNICATION LAB(21ECL46)
+                                 </label>
+                                 <label>
+                              <input type="checkbox" name="courses" value="21KSK47">
+                                KANNADA(21KSK47)
+                                 </label>
+                                 <label>
+                              <input type="checkbox" name="courses" value="21UH49">
+                                HUMAN VALUES(21UH49)
+                                 </label>
+                                 <label>
+                              <input type="checkbox" name="courses" value="21INT49">
+                                INTERNSHIP(21INT49)
+                                 </label>
+
+
+                                
+                        </div>
+                    </div>
+ <!-- Semester 5 Courses -->
+                    <div id="semester5Courses" class="course-group">
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC51">
+                                DIGITAL COMMUNICATION (21EC51)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC581">
+                                IOT LAB (21EC581)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC52">
+                                COMP & ARM (21EC52)
+                            </label>
+                            <label>
+                              <input type="checkbox" name="courses" value="21EC53">
+                                CCN  (21EC53)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21EC54">
+                                EMW(21EC54)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21ECL55">
+                                COMMUNICATION LAB(21ECL55)
+                                 </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21RMI56">
+                                RES & METH(21RMI56)
+                                 </label>
+                                 <label>
+                              <input type="checkbox" name="courses" value="21CIV57">
+                                ENVIRONMENTAL STUDIES(21CIV57)
+                                 </label>
+                                 
+                                
+                        </div>
+                    </div>
+ <!-- Semester 6 Courses -->
+                    <div id="semester6Courses" class="course-group">
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC61">
+                                MANAGEMENT (21EC61)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC62">
+                                MICROWAVE THEORY (21EC62)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21CS653">
+                                CYBER SECURITY (21CS653)
+                            </label>
+                            <label>
+                              <input type="checkbox" name="courses" value="21EC643">
+                                PYTHON PROGRAMMING  (21EC643)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21EC63">
+                                VLSI DESIGN(21EC63)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21ECL66">
+                                VLSI LAB(21ECL66)
+                                 </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21ECMP67">
+                                MINI PROJECT(21ECMP67)
+                                 </label>
+                                 <label>
+                              <input type="checkbox" name="courses" value="21INT68">
+                                INTERNSHIP(21INT68)
+                                 </label>
+                                 
+                                
+                        </div>
+                    </div>
+
+
+<!-- Semester 7 Courses -->
+                    <div id="semester7Courses" class="course-group">
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC71">
+                                ADV VLSI (21EC71)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC732">
+                                DIP (21EC732)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC72">
+                                OPTICAL WIRELESS (21EC72)
+                            </label>
+                            <label>
+                              <input type="checkbox" name="courses" value="21CS752">
+                                AI & ML  (21CS752)
+                                </label>
+                                <label>
+                              <input type="checkbox" name="courses" value="21EC742">
+                                NETWORK SECURITY(21EC742)
+                                </label>                                 
+                                
+                        </div>
+                    </div>
+<!-- Semester 8 Courses -->
+                    <div id="semester8Courses" class="course-group">
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC81">
+                                TECHNICAL SEMINAR (21EC81)
+                            </label>
+                            <label>
+                                <input type="checkbox" name="courses" value="21EC82">
+                                MAJOR PROJECT (21EC82)
+                            </label>                                
+                                
+                        </div>
+                    </div>
+
+
+                    <!-- Other Semester Courses (Placeholder) -->
+                    <div id="otherSemesterCourses" class="course-group">
+                        <p>Please select a semester to view available courses.</p>
+                    </div>
+                    
+                    <!-- Other Courses (All Semesters) -->
+                    <div class="other-courses-group">
+                        <input type="checkbox" name="courses" value="other" id="otherCoursesCheckbox">
+                        <input type="text" name="otherCourses" id="otherCoursesInput" placeholder="Enter other courses (if any)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="college">College:</label>
+                    <select id="college" name="college" required>
+                        <option value="">Select Your College</option>
+                        <option value="donbosco">Don Bosco Institute of Technology</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Get Approval" class="submit-btn">
+                </div>
+            </form>
+        </div>
+
+        <!-- Waiting for Approval Page -->
+        <div id="waitingApprovalPage">
+            <div class="waiting-container">
+                <h2>Waiting for Approval</h2>
+                <div class="spinner"></div>
+                <p>Your exam application has been submitted.</p>
+                <p>An approval request has been sent to the administrator.</p>
+                <p>Please wait for further instructions.</p>
+                <div class="nav-links">
+                    <span class="nav-link" onclick="checkApplicationStatus()">Check Application Status</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Status Page -->
+        <div id="approvalStatusPage">
+            <h1>Application Status</h1>
+            <div id="statusContainer">
+                <!-- Status will be filled dynamically -->
+            </div>
+            <div class="nav-links">
+                <span class="nav-link" onclick="backToLogin()">Back to Login</span>
+            </div>
+        </div>
+
+        <!-- Fee Payment Page -->
+        <div id="feePaymentPage">
+            <h1>Exam Fee Payment</h1>
+            
+            <div class="fee-container">
+                <h2>Examination Fee Details</h2>
+                <p>Please pay the following amount to complete your exam registration:</p>
+                <div class="fee-amount">₹2030/-</div>
+                <p>(Including ₹30 convenience fee)</p>
+            </div>
+            
+            <div class="subjects-list">
+                <h3>Selected Subjects for Semester <span id="selectedSemester"></span>:</h3>
+                <ul id="selectedSubjectsList">
+                    <!-- Subjects will be filled dynamically -->
+                </ul>
+            </div>
+            
+            <button class="payment-btn" onclick="proceedToPayment()">Proceed to Payment</button>
+            
+            <div class="nav-links">
+                <span class="nav-link" onclick="backToApplicationStatus()">Back to Application</span>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard Page -->
+        <div id="adminDashboardPage">
+            <h1>Admin Dashboard</h1>
+            <div class="admin-panel">
+                <h2>Pending Applications</h2>
+                <div id="applicationsList" class="application-list">
+                    <!-- Applications will be filled dynamically -->
+                </div>
+            </div>
+            <div class="nav-links">
+                <span class="nav-link" onclick="backToLogin()">Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock database for users and applications
+        const mockDatabase = {
+            users: [
+                { phoneNumber: '1234567890', password: 'password123', role: 'student' },
+                { phoneNumber: '5556667777', password: 'student2024', role: 'student' },
+                { phoneNumber: '9876543210', password: 'adminpass', role: 'admin' }
+            ],
+            applications: []
+        };
+
+        // Current user session
+        let currentUser = null;
+        let currentApplication = null;
+
+        // Function to toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+        }
+
+        // Function to update course options based on selected semester
+        function updateCourseOptions() {
+            const semesterSelect = document.getElementById('semester');
+            const semester1Courses = document.getElementById('semester1Courses');
+            const semester2Courses = document.getElementById('semester2Courses');
+            const otherSemesterCourses = document.getElementById('otherSemesterCourses');
+            
+            // Hide all course groups first
+            semester1Courses.classList.remove('active');
+            semester2Courses.classList.remove('active');
+semester3Courses.classList.remove('active');
+semester4Courses.classList.remove('active');
+semester5Courses.classList.remove('active');
+semester6Courses.classList.remove('active');
+semester7Courses.classList.remove('active');
+semester8Courses.classList.remove('active');
+            otherSemesterCourses.classList.remove('active');
+            
+            // Show appropriate course group based on selected semester
+            if (semesterSelect.value === 'semester1') {
+                semester1Courses.classList.add('active');
+            } else if (semesterSelect.value === 'semester2') {
+                semester2Courses.classList.add('active');
+            } else if (semesterSelect.value === 'semester3') {
+                semester3Courses.classList.add('active');
+            } else if (semesterSelect.value === 'semester4') {
+                semester4Courses.classList.add('active');
+            } else if (semesterSelect.value === 'semester5') {
+                semester5Courses.classList.add('active');
+            } else if (semesterSelect.value === 'semester6') {
+                semester6Courses.classList.add('active');
+            } else if (semesterSelect.value === 'semester7') {
+                semester7Courses.classList.add('active');
+            } else if (semesterSelect.value === 'semester8') {
+                semester8Courses.classList.add('active');
+            
+            } else if (semesterSelect.value !== '') {
+                otherSemesterCourses.classList.add('active');
+                otherSemesterCourses.innerHTML = '<p>Courses for ' + semesterSelect.options[semesterSelect.selectedIndex].text + ' are not currently available.</p>';
+            }
+        }
+
+        // Function to show registration page
+        function showRegisterPage() {
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('registerPage').classList.add('active');
+            // Clear any previous error messages
+            document.getElementById('phoneError').innerHTML = '';
+            document.getElementById('passwordError').innerHTML = '';
+            document.getElementById('confirmPasswordError').innerHTML = '';
+        }
+
+        // Function to show admin login
+        function showAdminLogin() {
+            alert('Admin Login: Use phone number 9876543210 and password "adminpass"');
+        }
+
+        // Function to handle registration
+        function register() {
+            const phoneNumber = document.getElementById('registerPhoneNumber').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            let isValid = true;
+
+            // Clear previous error messages
+            document.getElementById('phoneError').innerHTML = '';
+            document.getElementById('passwordError').innerHTML = '';
+            document.getElementById('confirmPasswordError').innerHTML = '';
+
+            // Validate phone number
+            if (phoneNumber.length !== 10 || !/^\d+$/.test(phoneNumber)) {
+                document.getElementById('phoneError').innerHTML = 'Please enter a valid 10-digit phone number';
+                isValid = false;
+            }
+
+            // Check if phone number already exists
+            if (mockDatabase.users.some(user => user.phoneNumber === phoneNumber)) {
+                document.getElementById('phoneError').innerHTML = 'This phone number is already registered';
+                isValid = false;
+            }
+
+            // Validate password
+            if (password.length < 8) {
+                document.getElementById('passwordError').innerHTML = 'Password must be at least 8 characters long';
+                isValid = false;
+            }
+
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').innerHTML = 'Passwords do not match';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            // Add new user to mock database
+            mockDatabase.users.push({
+                phoneNumber: phoneNumber,
+                password: password,
+                role: 'student'
+            });
+
+            alert('Registration successful! You can now login with your credentials.');
+            backToLogin();
+        }
+
+        // Function to simulate login
+        function login() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const password = document.getElementById('password').value;
+
+            // Basic validation
+            if (phoneNumber.length !== 10 || !/^\d+$/.test(phoneNumber)) {
+                alert('Please enter a valid 10-digit phone number');
+                return;
+            }
+
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return;
+            }
+
+            // Check if user exists in mock database
+            const user = mockDatabase.users.find(u => u.phoneNumber === phoneNumber && u.password === password);
+            
+            if (!user) {
+                alert('Invalid credentials. Please check the demo credentials displayed on the login page or register a new account.');
+                return;
+            }
+
+            // Set current user
+            currentUser = user;
+
+            // Check if user is admin or student
+            if (user.role === 'admin') {
+                // Load admin dashboard
+                loadAdminDashboard();
+                // Hide login page and show admin dashboard page
+                document.getElementById('loginPage').classList.remove('active');
+                document.getElementById('adminDashboardPage').classList.add('active');
+            } else {
+                // Check if user has an existing application
+                const existingApplication = mockDatabase.applications.find(app => app.phoneNumber === phoneNumber);
+                if (existingApplication) {
+                    currentApplication = existingApplication;
+                    checkApplicationStatus();
+                } else {
+                    // Hide login page and show exam application page
+                    document.getElementById('loginPage').classList.remove('active');
+                    document.getElementById('examApplicationPage').classList.add('active');
+                    // Initialize course options
+                    updateCourseOptions();
+                }
+            }
+        }
+
+        // Function to load admin dashboard
+        function loadAdminDashboard() {
+            const applicationsList = document.getElementById('applicationsList');
+            applicationsList.innerHTML = '';
+
+            // Filter pending applications
+            const pendingApplications = mockDatabase.applications.filter(app => app.status === 'pending');
+
+            if (pendingApplications.length === 0) {
+                applicationsList.innerHTML = '<p>No pending applications.</p>';
+                return;
+            }
+
+            // Display each application
+            pendingApplications.forEach(app => {
+                const applicationItem = document.createElement('div');
+                applicationItem.className = 'application-item';
+                applicationItem.innerHTML = `
+                    <div class="application-details">
+                        <p><strong>Name:</strong> ${app.fullName}</p>
+                        <p><strong>USN:</strong> ${app.usn}</p>
+                        <p><strong>Email:</strong> ${app.email}</p>
+                        <p><strong>Program:</strong> ${app.program}</p>
+                        <p><strong>Branch:</strong> ${app.branch}</p>
+                        <p><strong>Semester:</strong> ${app.semester}</p>
+                        <p><strong>Courses:</strong> ${app.courses.join(', ')}</p>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="approve-btn" onclick="approveApplication('${app.id}')">Approve</button>
+                        <button class="reject-btn" onclick="rejectApplication('${app.id}')">Reject</button>
+                    </div>
+                `;
+                applicationsList.appendChild(applicationItem);
+            });
+        }
+
+        // Function to approve application
+        function approveApplication(applicationId) {
+            const applicationIndex = mockDatabase.applications.findIndex(app => app.id === applicationId);
+            if (applicationIndex !== -1) {
+                mockDatabase.applications[applicationIndex].status = 'approved';
+                mockDatabase.applications[applicationIndex].approvalDate = new Date().toISOString();
+                alert('Application approved successfully!');
+                loadAdminDashboard();
+            }
+        }
+
+        // Function to reject application
+        function rejectApplication(applicationId) {
+            const reason = prompt('Please provide a reason for rejection:');
+            if (reason !== null) {
+                const applicationIndex = mockDatabase.applications.findIndex(app => app.id === applicationId);
+                if (applicationIndex !== -1) {
+                    mockDatabase.applications[applicationIndex].status = 'rejected';
+                    mockDatabase.applications[applicationIndex].rejectionReason = reason;
+                    alert('Application rejected successfully!');
+                    loadAdminDashboard();
+                }
+            }
+        }
+
+        // Function to submit exam application
+        function submitExamApplication(event) {
+            event.preventDefault();
+
+            // Collect form data
+            const formData = new FormData(event.target);
+            const courses = formData.getAll('courses');
+            const otherCourses = formData.get('otherCourses');
+            
+            if (otherCourses && courses.includes('other')) {
+                courses.pop(); // Remove 'other'
+                courses.push(otherCourses);
+            }
+            
+            // Create application object
+            const application = {
+                id: generateId(),
+                phoneNumber: currentUser.phoneNumber,
+                fullName: formData.get('fullName'),
+                usn: formData.get('usn'),
+                email: formData.get('email'),
+                program: formData.get('program'),
+                branch: formData.get('branch'),
+                semester: formData.get('semester'),
+                courses: courses,
+                college: formData.get('college'),
+                status: 'pending',
+                submissionDate: new Date().toISOString()
+            };
+
+            // Add application to mock database
+            mockDatabase.applications.push(application);
+            currentApplication = application;
+
+            // Switch to waiting approval page
+            document.getElementById('examApplicationPage').classList.remove('active');
+            document.getElementById('waitingApprovalPage').classList.add('active');
+
+            // Simulated email sending
+            console.log('Simulated email sent to admin for approval');
+            console.log('Application data:', application);
+
+            return false;
+        }
+
+        // Function to check application status
+        function checkApplicationStatus() {
+            if (!currentApplication) {
+                alert('No application found!');
+                return;
+            }
+
+            // Hide current page and show approval status page
+            document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+            document.getElementById('approvalStatusPage').classList.add('active');
+
+            // Display application status
+            const statusContainer = document.getElementById('statusContainer');
+            
+            let statusHTML = `
+                <div class="application-item">
+                    <h3>Application Details</h3>
+                    <p><strong>Name:</strong> ${currentApplication.fullName}</p>
+                    <p><strong>USN:</strong> ${currentApplication.usn}</p>
+                    <p><strong>Submission Date:</strong> ${formatDate(currentApplication.submissionDate)}</p>
+                    <p><strong>Status:</strong> <span class="status-${currentApplication.status}">${capitalizeFirstLetter(currentApplication.status)}</span></p>
+            `;
+
+            if (currentApplication.status === 'approved') {
+                statusHTML += `<p><strong>Approval Date:</strong> ${formatDate(currentApplication.approvalDate)}</p>`;
+                statusHTML += `<p>Your application has been approved. You can now proceed with your exams.</p>`;
+                // Add button to proceed to fee payment
+                statusHTML += `<button class="payment-btn" onclick="showFeePaymentPage()">Proceed to Fee Payment</button>`;
+            } else if (currentApplication.status === 'rejected') {
+                statusHTML += `<p><strong>Reason for Rejection:</strong> ${currentApplication.rejectionReason}</p>`;
+                statusHTML += `<p>Please contact the administration for further assistance.</p>`;
+            } else {
+                statusHTML += `<p>Your application is currently under review. Please check back later.</p>`;
+            }
+
+            statusHTML += `</div>`;
+            statusContainer.innerHTML = statusHTML;
+        }
+
+        // Function to show fee payment page
+        function showFeePaymentPage() {
+            if (!currentApplication) {
+                alert('No application found!');
+                return;
+            }
+
+            // Hide current page and show fee payment page
+            document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+            document.getElementById('feePaymentPage').classList.add('active');
+
+            // Display selected semester
+            const semesterSelect = document.getElementById('semester');
+            const semesterText = semesterSelect.options[semesterSelect.selectedIndex].text;
+            document.getElementById('selectedSemester').textContent = semesterText.replace('Semester ', '');
+
+            // Display selected subjects
+            const subjectsList = document.getElementById('selectedSubjectsList');
+            subjectsList.innerHTML = '';
+            
+            currentApplication.courses.forEach(course => {
+                const li = document.createElement('li');
+                li.textContent = course;
+                subjectsList.appendChild(li);
+            });
+        }
+
+        // Function to proceed to payment (simulated)
+        function proceedToPayment() {
+            alert('Redirecting to payment gateway...\n\nThis is a simulation. In a real application, this would redirect to a payment processor like Razorpay, Paytm, etc.');
+            
+            // In a real implementation, you would:
+            // 1. Generate a payment request
+            // 2. Redirect to payment gateway
+            // 3. Handle payment callback
+            // 4. Update application status to "paid"
+        }
+
+        // Function to go back to application status
+        function backToApplicationStatus() {
+            document.getElementById('feePaymentPage').classList.remove('active');
+            document.getElementById('approvalStatusPage').classList.add('active');
+            checkApplicationStatus();
+        }
+
+        // Function to go back to login
+        function backToLogin() {
+            // Clear form fields if coming from registration
+            if (document.getElementById('registerPage').classList.contains('active')) {
+                document.getElementById('registerForm').reset();
+            }
+            
+            // Reset current user and application only if specifically logging out
+            if (document.getElementById('adminDashboardPage').classList.contains('active') || 
+                document.getElementById('approvalStatusPage').classList.contains('active') ||
+                document.getElementById('feePaymentPage').classList.contains('active')) {
+                currentUser = null;
+                currentApplication = null;
+            }
+
+            // Hide all pages and show login page
+            document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+            document.getElementById('loginPage').classList.add('active');
+        }
+
+        // Helper function to generate a random ID
+        function generateId() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+
+        // Helper function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        // Helper function to capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        // Ensure the 'other courses' checkbox is checked when text is entered
+        document.getElementById('otherCoursesInput').addEventListener('input', function() {
+            const otherCoursesCheckbox = document.getElementById('otherCoursesCheckbox');
+            otherCoursesCheckbox.checked = this.value.trim() !== '';
+        });
+    </script>
+
+</body>
+</html>
